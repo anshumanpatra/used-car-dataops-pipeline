@@ -11,7 +11,7 @@ LOG_FILE = "logs/pipeline_log.json"
 PLOT_FILE = "outputs/correlation_matrix.png"
 RAW_DATA_FILE = "data/raw_cars.csv"
 
-# Sidebar Controls & Manual Entry
+# Sidebar Controls & Manual Data Entry
 st.sidebar.header("Controls")
 if st.sidebar.button("Refresh Dashboard"):
   st.rerun()
@@ -21,25 +21,52 @@ st.sidebar.header("Manual Data Entry")
 
 with st.sidebar.form("add_car_form"):
   st.write("Add New Vehicle Record")
-  year = st.number_input("Year", min_value=1990, max_value=2026, value=2022)
+  car_name = st.text_input("Car Name", "2021 Hyundai i20 Sportz")
+  year = st.number_input("Year", min_value=1990, max_value=2026, value=2021)
   selling_price = st.number_input(
-      "Selling Price (Lakhs/K)", min_value=0.1, value=6.5
+      "Selling Price (Lakhs)", min_value=0.1, value=7.50, step=0.1
   )
-  kms_driven = st.number_input("Kms Driven", min_value=0, value=18000)
+  kms_driven = st.number_input(
+      "Kms Driven", min_value=0, value=25000, step=1000
+  )
   fuel_type = st.selectbox("Fuel Type", ["Petrol", "Diesel", "CNG"])
-  seller_type = st.selectbox("Seller Type", ["Dealer", "Individual"])
+  owner_type = st.selectbox(
+      "Owner Type", ["First Owner", "Second Owner", "Third Owner"]
+  )
   transmission = st.selectbox("Transmission", ["Manual", "Automatic"])
+  mileage = st.number_input(
+      "Mileage (kmpl)", min_value=0.0, value=18.5, step=0.1
+  )
+  engine = st.number_input("Engine (CC)", min_value=500, value=1197, step=50)
+  max_power = st.number_input(
+      "Max Power (bhp)", min_value=10.0, value=82.0, step=1.0
+  )
 
   submitted = st.form_submit_button("Add Record to Raw Data")
 
   if submitted:
+    # Calculate index position
+    next_idx = (
+        len(pd.read_csv(RAW_DATA_FILE)) if os.path.exists(RAW_DATA_FILE) else 0
+    )
+
+    # Construct DataFrame matching the 15-column schema
     new_record = pd.DataFrame([{
-        "Year": year,
-        "Selling_Price": selling_price,
-        "Kms_Driven": kms_driven,
+        "Index": next_idx,
+        "Car_Name": car_name,
+        "Reg_Date": "Jan-22",
+        "Insurance": "Comprehensive",
         "Fuel_Type": fuel_type,
-        "Seller_Type": seller_type,
+        "Seats": 5,
+        "Kms_Driven": kms_driven,
+        "Owner_Type": owner_type,
         "Transmission": transmission,
+        "Year": year,
+        "Mileage": mileage,
+        "Engine": engine,
+        "Displacement": engine,
+        "Max_Power": max_power,
+        "Selling_Price": selling_price,
     }])
 
     if os.path.exists(RAW_DATA_FILE):
