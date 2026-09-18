@@ -46,6 +46,8 @@ else:
 st.subheader("Automated Exploratory Data Analysis")
 if os.path.exists(PLOT_FILE):
   image = Image.open(PLOT_FILE)
-  st.image(image, caption="Feature Correlation Matrix", use_column_width=True)
+  st.image(
+      image, caption="Feature Correlation Matrix", use_container_width=True
+  )
 else:
   st.info("Correlation plot will render after the first pipeline execution.")
