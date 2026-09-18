@@ -5,16 +5,49 @@ from PIL import Image
 import streamlit as st
 
 st.set_page_config(page_title="DataOps Pipeline Monitor", layout="wide")
-
 st.title("Used Car DataOps Pipeline Monitoring Dashboard")
 
 LOG_FILE = "logs/pipeline_log.json"
 PLOT_FILE = "outputs/correlation_matrix.png"
+RAW_DATA_FILE = "data/raw_cars.csv"
 
-# Refresh Control
+# Sidebar Controls & Manual Entry
 st.sidebar.header("Controls")
 if st.sidebar.button("Refresh Dashboard"):
   st.rerun()
+
+st.sidebar.markdown("---")
+st.sidebar.header("Manual Data Entry")
+
+with st.sidebar.form("add_car_form"):
+  st.write("Add New Vehicle Record")
+  year = st.number_input("Year", min_value=1990, max_value=2026, value=2022)
+  selling_price = st.number_input(
+      "Selling Price (Lakhs/K)", min_value=0.1, value=6.5
+  )
+  kms_driven = st.number_input("Kms Driven", min_value=0, value=18000)
+  fuel_type = st.selectbox("Fuel Type", ["Petrol", "Diesel", "CNG"])
+  seller_type = st.selectbox("Seller Type", ["Dealer", "Individual"])
+  transmission = st.selectbox("Transmission", ["Manual", "Automatic"])
+
+  submitted = st.form_submit_button("Add Record to Raw Data")
+
+  if submitted:
+    new_record = pd.DataFrame([{
+        "Year": year,
+        "Selling_Price": selling_price,
+        "Kms_Driven": kms_driven,
+        "Fuel_Type": fuel_type,
+        "Seller_Type": seller_type,
+        "Transmission": transmission,
+    }])
+
+    if os.path.exists(RAW_DATA_FILE):
+      new_record.to_csv(RAW_DATA_FILE, mode="a", header=False, index=False)
+    else:
+      new_record.to_csv(RAW_DATA_FILE, index=False)
+
+    st.sidebar.success("Record appended to raw_cars.csv!")
 
 # Execution Metrics & Status
 st.subheader("Pipeline Execution Logs")
