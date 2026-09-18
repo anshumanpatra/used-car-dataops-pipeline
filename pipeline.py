@@ -94,9 +94,9 @@ def run_pipeline():
 
   # 6. Auto-Sync Updated Logs & Plots to GitHub
   try:
-    os.system('git add logs/pipeline_log.json outputs/correlation_matrix.png')
+    os.system('git add .')
     os.system(f'git commit -m "Auto-update pipeline logs at {timestamp}"')
-    os.system('git pull origin main --rebase')
+    os.system('git pull origin main --rebase --autostash')
     os.system('git push origin main')
     print(f'[{timestamp}] Logs successfully synced and pushed to GitHub.\n')
   except Exception as git_err:
