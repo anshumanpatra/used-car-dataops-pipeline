@@ -90,10 +90,20 @@ def run_pipeline():
   with open(log_file, 'w') as f:
     json.dump(logs, f, indent=4)
 
-  print(f'[{timestamp}] Pipeline Status: {status}\n')
+  print(f'[{timestamp}] Pipeline Status: {status}')
+
+  # 6. Auto-Sync Updated Logs & Plots to GitHub
+  try:
+    os.system('git add logs/pipeline_log.json outputs/correlation_matrix.png')
+    os.system(f'git commit -m "Auto-update pipeline logs at {timestamp}"')
+    os.system('git pull origin main --rebase')
+    os.system('git push origin main')
+    print(f'[{timestamp}] Logs successfully synced and pushed to GitHub.\n')
+  except Exception as git_err:
+    print(f'[{timestamp}] Git Auto-Push Failed: {git_err}\n')
 
 
-# 6. Schedule workflow to run every 2 minutes
+# Schedule workflow to run every 2 minutes
 schedule.every(2).minutes.do(run_pipeline)
 
 if __name__ == '__main__':
